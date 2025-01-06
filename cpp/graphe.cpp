@@ -18,8 +18,8 @@ graphe::graphe(const char * fichierArcs, const char * fichierNoeuds) {
 void graphe::afficher() {
     noeuds.afficher();
     arcs.afficher();
-    cout << "       -> Nombre de noeuds : " << nbNoeuds << endl;
-    cout << "       -> Nombre d'arcs : " << nbArcs << endl;
+    cout << "           -> Nombre de noeuds : " << nbNoeuds << endl;
+    cout << "           -> Nombre d'arcs : " << nbArcs << endl;
     cout << "\n===========================================================================" << endl << endl;
 }
 
@@ -276,6 +276,140 @@ int graphe::degre(const string & idNoeud) {
     int degreEntrant = cible->getArcs_entrants().size();
 
     return degreSortant + degreEntrant;
+
+}
+
+void graphe::parcours(noeud & s) {
+
+    stack<noeud*> pile; // Création d'une pile de noeuds initialement vide
+
+    // Initialisation de tous les noeuds comme non visités
+    for(auto & [idNoeud, noeudObj] : noeuds.getNoeuds()) {
+        noeudObj.setVisite(false);
+    }
+
+    pile.push(&s); // Empile le noeud de départ (s) dans la pile
+
+    // Parcours en profondeur (DFS)
+    while(!pile.empty()) {
+
+        noeud * sommet = pile.top(); // Stockage du noeud au sommet de la pile
+        pile.pop(); // Suppression de ce noeud dans la pile
+
+        // Si le noeud n'a pas encore été visité
+        if(!sommet->getVisite()) {
+            sommet->setVisite(true); // On le met comme ayant été visité = traité
+
+            // Parcours tous les arcs de ce noeud
+            for(const string & arcId : sommet->getArcs_sortants()) { 
+                arc * arcActuel = arcs.rechercher(arcId); // Stockage de l'arc sur lequel on est pour le moment
+
+                if(arcActuel) { // Vérifie que l'arc existe bien -> nécessaire pour empêcher d'éventuels erreurs
+                    noeud * voisin = noeuds.rechercher(arcActuel->getD()); // Stockage du noeud destination de l'arc
+                    if((voisin) && (!voisin->getVisite())) pile.push(voisin); // Si l'arc existe et qu'il n'a pas encore été visité, on l'ajoute dans la pile
+                }
+
+            }
+        }
+
+    }
+
+}
+
+vector<string> graphe::construction(noeud * origine, noeud * destination, int & nombreArcs) {
+
+    vector<string> cheminArcs; // Stockage des noms des arcs utilisés dans un vector
+    nombreArcs = 0; // Initialise à 0 le compteur d'arcs entre l'origine et la destination
+    noeud * noeudActuel = destination;
+
+    // Tant qu'on est pas arrivé au noeud origine
+    while(noeudActuel->getId() != origine->getId()) {
+
+        bool arcTrouvé = false;
+
+        // Parcours des arcs entrants pour trouver un chemin vers l'origine
+        for(const string & arcId : noeudActuel->getArcs_entrants()) {
+
+            arc * arcActuel = arcs.rechercher(arcId);
+
+            // Vérification que l'arc existe bien et recherche du noeud qui forme le chemin vers l'origine 
+            if((arcActuel) && (noeuds.rechercher(arcActuel->getO())->getVisite())) {
+                cheminArcs.push_back(arcActuel->getName()); // Stockage du nom de l'arc dans le vector
+                noeudActuel = noeuds.rechercher(arcActuel->getO()); // Passage au nom suivant pour former le chemin
+                arcTrouvé = true;
+                nombreArcs++;
+                break;
+            }
+
+        }
+
+        // Si on a pas réussi à trouvé le chemin vers le noeud origine
+        if(!arcTrouvé) {
+            cerr << "Erreur dans le retracage du chemin vers le noeud d'origine !" << endl;
+            cheminArcs.clear(); // Vide le vector car le chemin est incomplet
+            nombreArcs = 0;
+            return cheminArcs; 
+        }
+
+    }
+
+    return cheminArcs;
+
+}
+
+int graphe::chemin(string o, string d) {
+
+    // Vérification de la validité des noeuds origine et destination
+    noeud * origine = noeuds.rechercher(o);
+    noeud * destination = noeuds.rechercher(d);
+
+    // Cas où l'un des deux noeuds n'existe pas dans le graphe
+    if((!origine) || (!destination)) {
+        // Cherche quel(s) noeud(s) pose(nt) problème
+        if(!origine) {
+            if(!destination) {
+                cerr << "Erreur : Les noeuds origine et destination n'existent pas dans le graphe !" << endl;
+                return 0;
+            }
+            if(destination) {
+                cerr << "Erreur : Le noeud origine n'existe pas dans le graphe !" << endl;
+                return 0;
+            }
+        }
+        if(origine) {
+            cerr << "Erreur : Le noeud destination n'existe pas dans le graphe !" << endl;
+            return 0;
+        }
+    }
+
+    parcours(*origine); // Appel de la méthode parcours pour parcourir le graphe à partir du noeud d'origine pour trouver un chemin vers le noeud destination
+
+    // Si le noeud destination n'a pas été visité = il n'existe pas de chemin entre le noeud origine et le noeud destination
+    if(!destination->getVisite()) {
+        cout << "       -> Aucun chemin trouvé entre " << o << " et " << d << "." << endl;
+        return 0;
+    }
+
+    // SI on est ici c'est qu'il existe un chemin entre l'origine et la destination
+
+    // Construction du chemin en remontant les arcs du noeud destination au noeud origine
+    int nombreArcs = 0;
+    vector<string> cheminArcs = construction(origine, destination, nombreArcs);
+
+    // Si le vector est vide -> erreur dans le retracage du chemin 
+    if(cheminArcs.empty()) {
+        cout << "       -> Aucun chemin trouvé entre le noeud origine " << o << " et le noeud destination " << d << "." << endl;
+        return 0;
+    }
+
+    // Affichage des noms des routes utilisées pour le chemin
+    cout << "       -> Un chemin a bien été trouvé entre le noeud origine " << o << " et le noeud destination " << d << ".\n" << endl;
+    cout << "              Voici le chemin à prendre : " << endl;
+    for(auto & nomChemin : cheminArcs) {
+        cout << "              ->" << nomChemin << endl;
+    }
+
+    return nombreArcs;
 
 }
 

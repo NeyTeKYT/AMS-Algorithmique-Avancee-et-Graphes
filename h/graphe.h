@@ -22,6 +22,9 @@ class graphe {
         int lecture_noeuds(const char * fichierNoeuds);
         void liste_incidence();
         int degre(const string & idNoeud);
+        void parcours(noeud & s);
+        vector<string> construction(noeud * origine, noeud * destination, int & nombreArcs);
+        int chemin(string o, string d);
 
         // Getters
         V getNoeuds();

@@ -47,17 +47,15 @@ int noeud::getStreet_count() {
     return street_count;
 }
 
+bool noeud::getVisite() {
+    return visite;
+}
+
 vector<string> noeud::getArcs_sortants() const {
-    if(arcs_sortants.empty()) {
-        cout << "   -> Attention : Aucun arc sortant pour le noeud " << id << endl;
-    }
     return arcs_sortants;
 }
 
 vector<string> noeud::getArcs_entrants() const {
-    if(arcs_entrants.empty()) {
-        cout << "   -> Attention : Aucun arc entrant pour le noeud " << id << endl;
-    }
     return arcs_entrants;
 }
 
@@ -84,6 +82,10 @@ bool noeud::setStreet_Count(int street_count) {
     if(street_count < 0) return false;
     (*this).street_count = street_count;
     return true;
+}
+
+void noeud::setVisite(bool visite) {
+    (*this).visite = visite;
 }
 
 void noeud::ajouterArcSortant(string idArc) { 

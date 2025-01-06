@@ -8,9 +8,20 @@ void testDegre(graphe G) {
     string idNoeud = "152293"; // À remplacer par un identifiant de noeud valide
     int degreNoeud = G.degre(idNoeud); 
 
-    if (degreNoeud != -1) cout << "   -> Le degré du noeud " << idNoeud << " est : " << degreNoeud << endl << endl;
+    if (degreNoeud != -1) cout << "       -> Le degré du noeud " << idNoeud << " est : " << degreNoeud << endl << endl;
 
     cout << "===========================================================================\n" << endl;
+}
+
+void testChemin(graphe G) {
+
+    // Test du chemin entre deux noeuds
+    string idNoeudOrigine = "152293"; // À remplacer par un identifiant de noeud valide
+    string idNoeudDestination = "152294"; // À remplacer par un identifiant de noeud valide
+    int nbArcsChemin = G.chemin(idNoeudOrigine, idNoeudDestination);
+
+    cout << "\n===========================================================================\n" << endl;
+
 }
 
 int main() {
@@ -26,6 +37,7 @@ int main() {
     G.afficher(); // Afficher les informations sur le graphe crée à partir des deux fichiers
 
     testDegre(G);
+    testChemin(G);
 
     cout << "\n" << endl;
 
