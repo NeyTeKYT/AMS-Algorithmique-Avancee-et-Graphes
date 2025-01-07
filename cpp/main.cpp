@@ -8,14 +8,14 @@ void testDegre(graphe G) {
     string idNoeud = "152293"; // À remplacer par un identifiant de noeud valide
     int degreNoeud = G.degre(idNoeud); 
 
-    if (degreNoeud != -1) cout << "       -> Le degré du noeud " << idNoeud << " est : " << degreNoeud << endl << endl;
+    if (degreNoeud != -1) cout << "   -> Le degré du noeud " << idNoeud << " est : " << degreNoeud << endl << endl;
 
     cout << "===========================================================================\n" << endl;
 }
 
 void testChemin(graphe G) {
 
-    cout << "       -> Test de la fonction chemin qui utilise le parcours en profondeur :\n" << endl;
+    cout << "   -> Test de la fonction chemin qui utilise le parcours en profondeur :\n" << endl;
 
     // Test du chemin entre deux noeuds
     string idNoeudOrigine = "152293"; // À remplacer par un identifiant de noeud valide
@@ -28,7 +28,7 @@ void testChemin(graphe G) {
 
 void testPlusCourtChemin(graphe G) {
 
-    cout << "       -> Test de la fonction pluscourtchemin qui utilise le parcours en largeur :\n" << endl;
+    cout << "   -> Test de la fonction pluscourtchemin qui utilise le parcours en largeur :\n" << endl;
 
     // Test du chemin entre deux noeuds
     string idNoeudOrigine = "152293"; // À remplacer par un identifiant de noeud valide

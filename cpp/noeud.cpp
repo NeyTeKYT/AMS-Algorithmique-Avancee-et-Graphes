@@ -8,26 +8,38 @@ noeud::noeud(string id) {
 }
 
 void noeud::afficherArcs_sortants() {
-    cout << "Arcs sortants : ";
-    for(int i = 0; i < arcs_sortants.size(); i++) cout << arcs_sortants[i] << ", ";
-    cout << endl;
+    if(arcs_sortants.size() > 0) { 
+        cout << "      -> Arcs sortants : ";
+        for(int i = 0; i < arcs_sortants.size(); i++) {
+            cout << arcs_sortants[i];
+            if(i != arcs_sortants.size() - 1) cout << ", "; // Ajout d'une virgule si ce n'est pas le dernier élément du vector
+        }
+        cout << endl << endl;
+    }
 }
 
 void noeud::afficherArcs_entrants() {
-    cout << "Arcs entrants : ";
-    for(int i = 0; i < arcs_entrants.size(); i++) cout << arcs_entrants[i] << ", ";
-    cout << endl;
+
+    if(arcs_entrants.size() > 0) {
+        cout << "      -> Arcs entrants : ";
+        for(int i = 0; i < arcs_entrants.size(); i++) {
+            cout << arcs_entrants[i];
+            if(i != arcs_entrants.size() - 1) cout << ", "; // Ajout d'une virgule si ce n'est pas le dernier élément du vector
+        }
+        if(arcs_sortants.size() == 0) cout << endl << endl;
+        else cout << endl;
+    }
 }
 
 void noeud::afficher() {
-    cout << "===========================================================================\n" << endl;
-    cout << "    -> L'ID de ce noeud est : " << id << endl << 
-    "\n    -> Sa latitude est : " << y << endl << 
-    "\n    -> Sa longitude est : " << x << endl << 
-    "\n    -> Il y a " << street_count << " passant par ce noeud." << endl;
+    cout << "===========================================================================\n\n" << endl;
+    cout << "   -> L'ID de ce noeud est : " << id << endl << 
+    "\n\n   -> Sa latitude est : " << y << endl << 
+    "\n\n   -> Sa longitude est : " << x << endl << 
+    "\n\n   -> Il y a " << street_count << " routes passant par ce noeud." << endl;
 
-    afficherArcs_sortants();
     afficherArcs_entrants();
+    afficherArcs_sortants();
 }
 
 // Getters

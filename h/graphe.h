@@ -24,7 +24,7 @@ class graphe {
         int degre(const string & idNoeud);
 
         // Les deux fonctions parcours
-        void parcoursProfondeur(noeud & o, noeud & d); // DFS = Recherche en profondeur d'abord
+        void parcoursProfondeur(noeud & o, noeud & d, vector<string> & arcsVisites); // DFS = Recherche en profondeur d'abord
         void parcoursLargeur(noeud & o, noeud & d); // BFS = Recherche en largeur = Parcours d'abord tous les noeuds du même niveau avant de passer au niveau suivant
 
         vector<string> construction(noeud * origine, noeud * destination, int & nombreArcs); // Construit dans un vector le chemin = fonction pratique 

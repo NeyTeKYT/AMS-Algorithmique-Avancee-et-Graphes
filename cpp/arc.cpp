@@ -5,15 +5,16 @@ using namespace std;
 
 arc::arc(string id) {
     (*this).id = id;
+    // Je n'initialise pas les autres variables car j'utiliserai les set pour y mettre les valeurs.
 }
 
 void arc::afficher() {
 
-    cout << "===========================================================================\n" << endl;
+    cout << "===========================================================================\n\n" << endl;
 
-    cout << "   - Identifiant : " << id << " | Nom de la route : " << name << "\n" << endl;
+    cout << "   - Identifiant : " << id << " | Nom de la route : " << name << "\n\n" << endl;
 
-    cout << "   - Origine : " << o << " | Destination : " << d << "\n" << endl;
+    cout << "   - ID du Noeud Origine : " << o << " | ID du Noeud Destination : " << d << "\n\n" << endl;
 
     string estRouteSensUnique;
     if(oneway) {
@@ -22,27 +23,27 @@ void arc::afficher() {
     }
     else {
         estRouteSensUnique = "NON";
-        cout << "   - Route à sens unique : " << estRouteSensUnique << "\n" << endl;
+        cout << "   - Route à sens unique : " << estRouteSensUnique << "\n\n" << endl;
     }
 
-    if(oneway) {
-        if(reversed) cout << "      -> Sens de circulation : " << d << " -> " << o << "\n" << endl;
-        else cout << "      -> Sens de circulation : " << o << " -> " << d << "\n" << endl;
+    if(oneway) { // On ne cherche à savoir le sens de circulation que si la route est à sens unique
+        if(reversed) cout << "      -> Sens de circulation : " << d << " -> " << o << "\n\n" << endl;
+        else cout << "      -> Sens de circulation : " << o << " -> " << d << "\n\n" << endl;
     }
 
-    cout << "   - Type de route : " << highway << " | Nombre de voies : " << lanes << "\n" << endl;
+    cout << "   - Type de route : " << highway << " | Nombre de voies : " << lanes << "\n\n" << endl;
 
-    cout << "   - Longueur de la route : " << length << " mètres\n" << endl;
+    cout << "   - Longueur de la route : " << length << " mètres\n\n" << endl;
     
     if(geometry.size() > 0) {
         cout << "   - Les points constituant la route sont : \n      -> ";
         for(int i = 0; i < geometry.size(); i++) geometry[i].afficher();
-        cout << "\n" << endl;
+        cout << "\n\n" << endl;
     }
 
-    cout << "   - La vitesse maximale sur cette route est : " << maxspeed << " km/h\n" << endl;
+    cout << "   - La vitesse maximale sur cette route est : " << maxspeed << " km/h\n\n" << endl;
 
-    cout << "   - speed_kph : " << speed_kph << "\n" << endl; 
+    cout << "   - speed_kph : " << speed_kph << "\n\n" << endl; 
 
     cout << "   - En roulant à la vitesse maximale, il faut " << travel_time << " secondes pour traverser cette route.\n" << endl;
 }
