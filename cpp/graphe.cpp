@@ -60,9 +60,10 @@ int graphe::lecture_arcs(const char * fichierArcs) {
         string cleValeurAttribut;
 
         string id, name, highway;
-        bool oneway, reversed;
-        double length, speed, travel_time;
-        int lanes, maxspeed;
+        // Valeurs par défaut car certaines variables pourraient ne pas être initialisées correctement
+        bool oneway = false, reversed = false; 
+        double length = 0.0, speed = 0.0, travel_time = 0.0;
+        int lanes = 0, maxspeed = 0;
         vector<point> geometry;
     
         // Parcours de chaque attribut
@@ -246,7 +247,7 @@ void graphe::liste_incidence() {
     map<string, arc> allArcs = arcs.getArcs(); // Récupération de tous les arcs
     
     // Parcours chaque arc
-    for (auto& arcActuel : allArcs) {
+    for (auto & arcActuel : allArcs) {
 
         arc & currentArc = arcActuel.second; // Récupération de l'objet arc
 
@@ -267,8 +268,7 @@ void graphe::liste_incidence() {
 
 int graphe::degre(const string & idNoeud) {
 
-    // Recherche du noeud correspondant à l'identifiant donné
-    noeud * cible = noeuds.rechercher(idNoeud);
+    noeud * cible = noeuds.rechercher(idNoeud); // Recherche du noeud correspondant à l'identifiant donné
 
     if(!cible) return -1; // Renvoie -1 si le noeud n'a pas été trouvé
 
@@ -280,32 +280,35 @@ int graphe::degre(const string & idNoeud) {
 
 }
 
-void graphe::parcoursProfondeur(noeud & s) {
+void graphe::parcoursProfondeur(noeud & o, noeud & d) {
 
     stack<noeud*> pile; // Création d'une pile de noeuds initialement vide
 
-    // Initialisation de tous les noeuds comme non visités
-    for(auto & [idNoeud, noeudObj] : noeuds.getNoeuds()) {
-        noeudObj.setVisite(false);
+    for(auto & [id, noeud] : noeuds.getNoeuds()) {
+        noeud.setVisite(false); // Initialisation de tous les noeuds comme non visités
     }
 
-    pile.push(&s); // Empile le noeud de départ (s) dans la pile
+    pile.push(&o); // Empile le noeud d'origine
 
-    // Parcours en profondeur (DFS)
     while(!pile.empty()) {
 
-        noeud * sommet = pile.top(); // Stockage du noeud au sommet de la pile
-        pile.pop(); // Suppression de ce noeud dans la pile
+        noeud * sommet = pile.top(); 
+        pile.pop(); // Suppression du sommet de la pile après l'avoir stocké dans la variable sommet
 
-        // Si le noeud n'a pas encore été visité
-        if(!sommet->getVisite()) {
-            sommet->setVisite(true); // On le met comme ayant été visité = traité
+        if(!sommet->getVisite()) { // Si le noeud n'a pas encore été visité
+
+            sommet->setVisite(true); // On le met comme visité
+            cout << "Visite du noeud : " << sommet->getId() << endl; // Affichage des noeuds visités pour montrer la différence avec le parcours en largeur
+
+            if(sommet->getId() == d.getId()) { // Si on a trouvé le noeud destination
+                break; // On arrête le parcours 
+            }
 
             // Parcours tous les arcs sortants de ce noeud
             for(const string & arcId : sommet->getArcs_sortants()) { 
-                arc * arcActuel = arcs.rechercher(arcId); // Stockage de l'arc sur lequel on est pour le moment
+                arc * arcActuel = arcs.rechercher(arcId); // Recherche de l'arc
 
-                if(arcActuel) { // Vérifie que l'arc existe bien -> nécessaire pour empêcher d'éventuels erreurs
+                if(arcActuel) { // Si l'arc existe bien
                     noeud * voisin = noeuds.rechercher(arcActuel->getD()); // Stockage du noeud destination de l'arc
                     if((voisin) && (!voisin->getVisite())) pile.push(voisin); // Si l'arc existe et qu'il n'a pas encore été visité, on l'ajoute dans la pile
                 }
@@ -317,13 +320,58 @@ void graphe::parcoursProfondeur(noeud & s) {
 
 }
 
+void graphe::parcoursLargeur(noeud & o, noeud & d) {
+
+    queue<noeud*> file; // Utilisation d'une file pour le parcours en largeur
+
+    for(auto & [id, noeud] : noeuds.getNoeuds()) {
+        noeud.setVisite(false); // Initialisation de tous les noeuds comme non visités
+    }
+
+    file.push(&o); // Ajoute le noeud d'origine dans la file
+
+    int cpt = 1; // Permettre un meilleur affichage des logs 
+
+    while(!file.empty()) {
+
+        noeud * sommet = file.front(); 
+        file.pop(); // Suppression du premier noeud dans la file après l'avoir stocké dans la variable "sommet"
+
+        // Si le noeud n'a pas encore été visité
+        if(!sommet->getVisite()) {
+            sommet->setVisite(true); // On le met comme ayant été visité = traité
+            cout << "              " << cpt << ". Visite du noeud : " << sommet->getId() << endl; // Affichage pour montrer l'efficacité du parcours en largeur par rapport au parcours en profondeur
+            cpt++;
+
+            if(sommet->getId() == d.getId()) { // Si on a trouvé le noeud destination
+                break; // On arrête le parcours
+            }
+
+            // Parcours tous les arcs sortants de ce noeud
+            for(const string & arcId : sommet->getArcs_sortants()) { 
+                arc * arcActuel = arcs.rechercher(arcId); // Stockage de l'arc sur lequel on est pour le moment
+
+                if(arcActuel) { // Vérifie que l'arc existe bien -> nécessaire pour empêcher d'éventuels erreurs
+                    noeud * voisin = noeuds.rechercher(arcActuel->getD()); // Stockage du noeud destination de l'arc
+                    if((voisin) && (!voisin->getVisite())) file.push(voisin); // Si l'arc existe et qu'il n'a pas encore été visité, on l'ajoute dans la pile
+                }
+
+            }
+        }
+
+    }
+
+    cout << endl;
+
+}
+
 vector<string> graphe::construction(noeud * origine, noeud * destination, int & nombreArcs) {
 
-    vector<string> cheminArcs; // Stockage des noms des arcs utilisés dans un vector
-    nombreArcs = 0; // Initialise à 0 le compteur d'arcs entre l'origine et la destination
-    noeud * noeudActuel = destination;
+    vector<string> cheminArcs; // Stockage des noms des arcs dans un vector
+    nombreArcs = 0; // Initialisation du compteur d'arcs
+    noeud * noeudActuel = destination; 
 
-    // Tant qu'on est pas arrivé au noeud origine
+    // On remonte du noeud destination vers l'origine
     while(noeudActuel->getId() != origine->getId()) {
 
         bool arcTrouvé = false;
@@ -369,19 +417,18 @@ int graphe::chemin(string o, string d) {
         // Cherche quel(s) noeud(s) pose(nt) problème
         if(!origine) cerr << "Erreur : Le noeud origine n'existe pas dans le graphe." << endl;
         if(!destination) cerr << "Erreur : Le noeud destination n'existe pas dans le graphe." << endl;
+        return -1;
     }
 
-    parcoursProfondeur(*origine); // Appel de la méthode parcours pour parcourir le graphe à partir du noeud d'origine pour trouver un chemin vers le noeud destination
+    parcoursProfondeur(*origine, *destination); // Appel du parcours en profondeur pour trouver la destination
 
-    // Si le noeud destination n'a pas été visité = il n'existe pas de chemin entre le noeud origine et le noeud destination
+    // Si la destination n'a pas été visitée -> il n'y a pas de chemin
     if(!destination->getVisite()) {
         cout << "       -> Aucun chemin trouvé entre " << o << " et " << d << "." << endl;
         return 0;
     }
 
-    // SI on est ici c'est qu'il existe un chemin entre l'origine et la destination
-
-    // Construction du chemin en remontant les arcs du noeud destination au noeud origine
+    // Si on est ici -> un chemin existe -> on construit ce chemin
     int nombreArcs = 0;
     vector<string> cheminArcs = construction(origine, destination, nombreArcs);
 
@@ -399,43 +446,6 @@ int graphe::chemin(string o, string d) {
     }
 
     return nombreArcs;
-
-}
-
-void graphe::parcoursLargeur(noeud & s) {
-
-    queue<noeud*> file; // Utilisation d'une file pour le parcours en largeur
-
-    // Initialisation de tous les noeuds comme non visités
-    for(auto & [id, noeud] : noeuds.getNoeuds()) {
-        noeud.setVisite(false);
-    }
-
-    file.push(&s); // Ajout le noeud de départ (s) dans la file
-
-    // Parcours en largeur (BFS)
-    while(!file.empty()) {
-
-        noeud * sommet = file.front(); // Stockage du premier noeud dans la file
-        file.pop(); // Suppression de ce noeud dans la file
-
-        // Si le noeud n'a pas encore été visité
-        if(!sommet->getVisite()) {
-            sommet->setVisite(true); // On le met comme ayant été visité = traité
-
-            // Parcours tous les arcs sortants de ce noeud
-            for(const string & arcId : sommet->getArcs_sortants()) { 
-                arc * arcActuel = arcs.rechercher(arcId); // Stockage de l'arc sur lequel on est pour le moment
-
-                if(arcActuel) { // Vérifie que l'arc existe bien -> nécessaire pour empêcher d'éventuels erreurs
-                    noeud * voisin = noeuds.rechercher(arcActuel->getD()); // Stockage du noeud destination de l'arc
-                    if((voisin) && (!voisin->getVisite())) file.push(voisin); // Si l'arc existe et qu'il n'a pas encore été visité, on l'ajoute dans la pile
-                }
-
-            }
-        }
-
-    }
 
 }
 
@@ -450,13 +460,14 @@ int graphe::pluscourtchemin(string o, string d) {
         // Cherche quel(s) noeud(s) pose(nt) problème
         if(!origine) cerr << "Erreur : Le noeud origine n'existe pas dans le graphe." << endl;
         if(!destination) cerr << "Erreur : Le noeud destination n'existe pas dans le graphe." << endl;
+        return -1;
     }
 
-    parcoursLargeur(*origine); // Appel de la méthode parcours pour parcourir le graphe à partir du noeud d'origine pour trouver le plus court chemin vers le noeud destination
+    parcoursLargeur(*origine, *destination); // Appel de la méthode parcours pour parcourir le graphe à partir du noeud d'origine pour trouver le plus court chemin vers le noeud destination
 
     // Si le noeud destination n'a pas été visité = il n'existe pas de chemin entre le noeud origine et le noeud destination
     if(!destination->getVisite()) {
-        cout << "       -> Aucun chemin trouvé entre " << o << " et " << d << "." << endl;
+        cout << "              !!! Aucun chemin trouvé entre " << o << " et " << d << " !!!" << endl;
         return 0;
     }
 
@@ -468,52 +479,68 @@ int graphe::pluscourtchemin(string o, string d) {
 
     // Si le vector est vide -> erreur dans le retracage du chemin 
     if(cheminArcs.empty()) {
-        cout << "       -> Aucun chemin trouvé entre le noeud origine " << o << " et le noeud destination " << d << "." << endl;
+        cout << "              !!! Aucun chemin trouvé entre le noeud origine " << o << " et le noeud destination " << d << " !!!" << endl;
         return 0;
     }
 
     // Affichage des noms des routes utilisées pour le chemin
-    cout << "       -> Un chemin a bien été trouvé entre le noeud origine " << o << " et le noeud destination " << d << ".\n" << endl;
+    cout << "              !!! Un chemin a bien été trouvé entre le noeud origine " << o << " et le noeud destination " << d << " !!!\n" << endl;
     cout << "              Voici le chemin à prendre : " << endl;
+    // afficher le nom de la route origine
     for(auto & nomChemin : cheminArcs) {
         cout << "              ->" << nomChemin << endl;
     }
+    // afficher le nom de la route destination
 
     return nombreArcs;
 
 }
 
-int graphe::itineraire(string o, string d) {
+int graphe::itineraire(string o, string d) { // o et d contiennent les noms des rues -> il faut donc trouver l'ID du noeud
 
     // Création des deux variables pour l'origine et la destination
-    int verificationOrigine = -1; // Si la variable reste à -1 ça veut dire que nous n'avons pas trouvé la rue dans le graphe
-    string idNoeudOrigine;
-    int verificationDestination = -1;
+    string idNoeudOrigine; 
     string idNoeudDestination;
 
-    // Recherche des arcs correspondant à la rue d'origine et à la rue de destination
+    // Création de deux variables pour vérifier que nous avons bien trouvé le nom des rues 
+    bool rueOrigineTrouvée = false;
+    bool rueDestinationTrouvée = false;
+
+    // Parcours chaque noeud du graphe
     for(auto & [id, noeud] : noeuds.getNoeuds()) {
         
+        // Parcours tous les arcs (entrants et sortants) de ce noeud
         for(auto & [idArc, arc] : arcs.getArcs()) {
-            if(arc.getName() == o) {
-                idNoeudOrigine = arc.getId();
-                verificationOrigine = 1;
+
+            // Si l'arc correspond à l'origine
+            if(((arc.getName() == o) || (arc.getD() == o)) && (!rueOrigineTrouvée)) {
+                idNoeudOrigine = noeud.getId();
+                rueOrigineTrouvée = true;
             }
-            if(arc.getName() == d) {
-                idNoeudDestination = arc.getId();
-                verificationDestination = 1;
+
+            // Si l'arc correspond à la destination
+            if(((arc.getName() == d) || (arc.getD() == o)) && (!rueDestinationTrouvée)) {
+                idNoeudDestination = noeud.getId();
+                rueDestinationTrouvée = true;
             }
+
+            // Si les deux rues ont été trouvées -> on sort de la boucle de recherche des arcs du noeud
+            if((rueOrigineTrouvée) && (rueDestinationTrouvée)) break;
         }
 
+        // Si les deux rues ont été trouvées -> on sort de la boucle de recherche des noeuds
+        if((rueOrigineTrouvée) && (rueDestinationTrouvée)) break;
     }
 
     // Vérification qu'on a bien trouvé les identifiants des noeuds origine et destination
-    if((verificationOrigine == -1) || (verificationDestination == -1)) {
-        if(verificationOrigine == -1) cerr << "Erreur : La rue origine n'a pas été trouvée !" << endl;
-        if(verificationDestination == -1) cerr << "Erreur : la rue destination n'a pas été trouvée !" << endl;
-        return -1; // On laisse 0 pour dire que c'est une erreur dans pluscourtchemin et non dans itineraire -> permettre de plus facilement localiser l'erreur
+    if((!rueOrigineTrouvée) || (!rueDestinationTrouvée)) {
+        if(!rueOrigineTrouvée) cerr << "Erreur : La rue origine n'a pas été trouvée !" << endl;
+        if(!rueDestinationTrouvée) cerr << "Erreur : la rue destination n'a pas été trouvée !" << endl;
+        return -1; 
     }
 
+    // Si on est ici c'est que nous avons bien récupéré les ID des noeuds correspondant au route 
+    // donc on va appeller la fonction pluscourtchemin pour trouver l'itinéraire le plus court
     return pluscourtchemin(idNoeudOrigine, idNoeudDestination);
 
 }
