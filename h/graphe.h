@@ -22,9 +22,12 @@ class graphe {
         int lecture_noeuds(const char * fichierNoeuds);
         void liste_incidence();
         int degre(const string & idNoeud);
-        void parcours(noeud & s);
+        void parcoursProfondeur(noeud & s); // DFS = Recherche en profondeur d'abord
+        void parcoursLargeur(noeud & s); // BFS = Recherche en largeur = Parcours d'abord tous les noeuds du même niveau avant de passer au niveau suivant
         vector<string> construction(noeud * origine, noeud * destination, int & nombreArcs);
-        int chemin(string o, string d);
+        int chemin(string o, string d); // Utilise le parcours DFS
+        int pluscourtchemin(string o, string d); // Utilise le parcours BFS 
+        int itineraire(string o, string d); // Utilisation ici des noms des rues et non des identifiants des noeuds
 
         // Getters
         V getNoeuds();

@@ -24,6 +24,28 @@ void testChemin(graphe G) {
 
 }
 
+void testPlusCourtChemin(graphe G) {
+
+    // Test du chemin entre deux noeuds
+    string idNoeudOrigine = "152293"; // À remplacer par un identifiant de noeud valide
+    string idNoeudDestination = "657438"; // À remplacer par un identifiant de noeud valide
+    int nbArcsChemin = G.pluscourtchemin(idNoeudOrigine, idNoeudDestination);
+
+    cout << "\n===========================================================================\n" << endl;
+
+}
+
+void testItineraire(graphe G) {
+
+    // Test du chemin entre deux rues
+    string nomRueOrigine = "Avenue du Moulin de Notre-Dame"; // À remplacer par un nom de rue valide
+    string nomRueDestination = "Avenue de la Cabrière"; // À remplacer par un nom de rue valide
+    int nbArcsChemin = G.itineraire(nomRueOrigine, nomRueDestination);
+
+    cout << "\n===========================================================================\n" << endl;
+
+}
+
 int main() {
 
     cout << "\n" << endl;
@@ -37,7 +59,7 @@ int main() {
     G.afficher(); // Afficher les informations sur le graphe crée à partir des deux fichiers
 
     testDegre(G);
-    testChemin(G);
+    testItineraire(G);
 
     cout << "\n" << endl;
 
