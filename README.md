@@ -6,6 +6,8 @@ Le projet **AMS** (Activité de Mise en Situation) est une application développ
 
 Ce projet a pour but de mettre en pratique les connaissances théoriques acquises en algorithmique et en théorie des graphes, tout en développant des compétences en programmation orientée objet et en gestion de structures de données complexes.
 
+[Sujet.pdf](https://github.com/user-attachments/files/18338662/Sujet.pdf)
+
 ## Fonctionnalités
 
 Le projet implémente plusieurs fonctionnalités clés :
